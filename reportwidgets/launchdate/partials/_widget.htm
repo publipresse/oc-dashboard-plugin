@@ -1,0 +1,38 @@
+<?= $this->styles() ?>
+<div class="pp-dash">
+    <?php if (isset($error)): ?>
+        <p class="pp-dash-error"><?= e($error) ?></p>
+    <?php else: ?>
+        <div class="pp-dash-header">
+            <span class="pp-dash-badge <?= $isDown ? 'pp-dash-badge--maintenance' : 'pp-dash-badge--online' ?>">
+                <i class="ph ph-power"></i>
+            </span>
+            <div class="pp-dash-text">
+                <span class="pp-dash-eyebrow">Statut du site</span>
+                <p class="pp-dash-headline"><?= $isDown ? 'En maintenance' : 'En ligne' ?></p>
+            </div>
+        </div>
+
+        <?php if ($score !== null || $launchDate): ?>
+            <div class="pp-dash-body">
+                <?php if ($score !== null): ?>
+                    <p class="pp-dash-section-title">Audit SE Ranking</p>
+                    <p class="pp-dash-subtext"><?= e($scoreHeadline) ?></p>
+                    <?= $bar ?>
+                <?php endif ?>
+                <?php if ($launchDate): ?>
+                    <p class="pp-dash-subtext">Mis en ligne le : <?= e($launchDate) ?></p>
+                <?php endif ?>
+            </div>
+        <?php endif ?>
+
+        <div class="pp-dash-footer">
+            <?php if ($reportUrl): ?>
+                <a href="<?= e($reportUrl) ?>" target="_blank" rel="noopener noreferrer">Consulter le rapport</a>
+            <?php endif ?>
+            <a href="<?= e($maintenanceSettingsUrl) ?>">
+                <?= $isDown ? 'Mettre en ligne' : 'Mettre en maintenance' ?>
+            </a>
+        </div>
+    <?php endif ?>
+</div>

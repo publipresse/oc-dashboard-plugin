@@ -1,0 +1,35 @@
+<?= $this->styles() ?>
+<div class="pp-dash">
+    <?php if (isset($error)): ?>
+        <p class="pp-dash-error"><?= e($error) ?></p>
+    <?php elseif (!$iframe): ?>
+        <div class="pp-dash-placeholder">
+            <span class="pp-dash-badge pp-dash-badge--iframe"><?= $this->badgeIcon('ph ph-browser') ?></span>
+            <p class="pp-dash-empty">Aucun code iframe valide renseigné. Collez le code d'intégration (balise &lt;iframe&gt;) dans la configuration du module.</p>
+        </div>
+    <?php else: ?>
+        <div class="pp-dash-header">
+            <span class="pp-dash-badge pp-dash-badge--iframe"><?= $this->badgeIcon('ph ph-browser') ?></span>
+            <div class="pp-dash-text">
+                <span class="pp-dash-eyebrow"><?= e($this->widgetTitle()) ?></span>
+                <p class="pp-dash-headline"><?= e($host ?: 'Page externe') ?></p>
+            </div>
+        </div>
+
+        <div class="pp-dash-body">
+            <iframe
+                class="pp-dash-iframe"
+                src="<?= e($iframe['src']) ?>"
+                style="height: <?= (int) $height ?>px"
+                <?php foreach ($iframe['attributes'] as $name => $value): ?>
+                    <?= e($name) ?>="<?= e($value) ?>"
+                <?php endforeach ?>
+                <?php if ($iframe['allowfullscreen']): ?>allowfullscreen<?php endif ?>
+            ></iframe>
+        </div>
+
+        <div class="pp-dash-footer">
+            <a href="<?= e($iframe['src']) ?>" target="_blank" rel="noopener noreferrer">Ouvrir dans un nouvel onglet</a>
+        </div>
+    <?php endif ?>
+</div>

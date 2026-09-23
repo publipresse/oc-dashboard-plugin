@@ -1,0 +1,34 @@
+<?= $this->styles() ?>
+<div class="pp-dash">
+    <?php if (isset($error)): ?>
+        <p class="pp-dash-error"><?= e($error) ?></p>
+    <?php elseif (!$supportEmail && !$supportPhone): ?>
+        <div class="pp-dash-placeholder">
+            <span class="pp-dash-badge pp-dash-badge--support"><?= $this->badgeIcon('ph ph-headset') ?></span>
+            <p class="pp-dash-empty">Aucune information de support renseignée.</p>
+        </div>
+    <?php else: ?>
+        <div class="pp-dash-header">
+            <span class="pp-dash-badge pp-dash-badge--support"><?= $this->badgeIcon('ph ph-headset') ?></span>
+            <div class="pp-dash-text">
+                <span class="pp-dash-eyebrow"><?= e($this->widgetTitle()) ?></span>
+                <?php if ($supportEmail): ?>
+                    <a class="pp-dash-headline" href="mailto:<?= e($supportEmail) ?>"><?= e($supportEmail) ?></a>
+                <?php else: ?>
+                    <p class="pp-dash-headline">Nous contacter</p>
+                <?php endif ?>
+                <?php if ($supportPhone): ?>
+                    <ul class="pp-dash-detail-lines">
+                        <li><a href="tel:<?= e(preg_replace('/[^0-9+]/', '', $supportPhone)) ?>"><?= $this->icon('phone') ?> <?= e($supportPhone) ?></a></li>
+                    </ul>
+                <?php endif ?>
+            </div>
+        </div>
+
+        <?php if ($driveUrl): ?>
+            <div class="pp-dash-footer">
+                <a href="<?= e($driveUrl) ?>" target="_blank" rel="noopener noreferrer">Accéder à mon Drive photos</a>
+            </div>
+        <?php endif ?>
+    <?php endif ?>
+</div>

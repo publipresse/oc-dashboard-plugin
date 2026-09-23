@@ -1,0 +1,41 @@
+<?= $this->styles() ?>
+<div class="pp-dash">
+    <?php if (isset($error)): ?>
+        <p class="pp-dash-error"><?= e($error) ?></p>
+    <?php elseif (!count($items)): ?>
+        <div class="pp-dash-placeholder">
+            <span class="pp-dash-badge pp-dash-badge--breves"><?= $this->badgeIcon('ph ph-megaphone') ?></span>
+            <p class="pp-dash-empty">Aucune brève à afficher pour le moment.</p>
+        </div>
+    <?php else: ?>
+        <div class="pp-dash-header">
+            <span class="pp-dash-badge pp-dash-badge--breves"><?= $this->badgeIcon('ph ph-megaphone') ?></span>
+            <div class="pp-dash-text">
+                <span class="pp-dash-eyebrow">Restez informé</span>
+                <p class="pp-dash-headline">Nos brèves</p>
+            </div>
+        </div>
+
+        <div class="pp-dash-body">
+            <ul class="pp-dash-feed">
+                <?php foreach ($items as $item): ?>
+                    <li>
+                        <div class="pp-dash-feed__head">
+                            <span class="pp-dash-feed__title"><?= e($item['title']) ?></span>
+                            <?php if ($item['tag']): ?>
+                                <span class="pp-dash-feed__tag"><?= e($item['tag']) ?></span>
+                            <?php endif ?>
+                        </div>
+                        <?php if ($item['description']): ?>
+                            <p class="pp-dash-feed__desc"><?= e($item['description']) ?></p>
+                        <?php endif ?>
+                    </li>
+                <?php endforeach ?>
+            </ul>
+        </div>
+
+        <div class="pp-dash-footer">
+            <a href="https://www.publipresse.fr" target="_blank" rel="noopener noreferrer">Contacter Publipresse</a>
+        </div>
+    <?php endif ?>
+</div>

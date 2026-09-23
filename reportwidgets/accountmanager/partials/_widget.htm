@@ -1,0 +1,34 @@
+<?= $this->styles() ?>
+<div class="pp-dash">
+    <?php if (isset($error)): ?>
+        <p class="pp-dash-error"><?= e($error) ?></p>
+    <?php elseif (!$managerName && !$managerPhone && !$managerEmail): ?>
+        <div class="pp-dash-placeholder">
+            <span class="pp-dash-badge pp-dash-badge--contact"><?= $this->badgeIcon('ph ph-user') ?></span>
+            <p class="pp-dash-empty">Choisissez votre commercial dans la configuration du module.</p>
+        </div>
+    <?php else: ?>
+        <div class="pp-dash-header">
+            <?php if ($managerPhoto): ?>
+                <span class="pp-dash-badge pp-dash-badge--photo"><img src="<?= e($managerPhoto) ?>" alt="<?= e($managerName) ?>"></span>
+            <?php else: ?>
+                <span class="pp-dash-badge pp-dash-badge--contact"><?= $this->badgeIcon('ph ph-user') ?></span>
+            <?php endif ?>
+            <div class="pp-dash-text">
+                <span class="pp-dash-eyebrow"><?= e($this->widgetTitle()) ?></span>
+                <p class="pp-dash-headline"><?= e($managerName) ?></p>
+            </div>
+        </div>
+
+        <?php if ($managerPhone || $managerEmail): ?>
+            <div class="pp-dash-footer">
+                <?php if ($managerEmail): ?>
+                    <a href="mailto:<?= e($managerEmail) ?>"><?= $this->icon('email') ?> <?= e($managerEmail) ?></a>
+                <?php endif ?>
+                <?php if ($managerPhone): ?>
+                    <a href="tel:<?= e(preg_replace('/[^0-9+]/', '', $managerPhone)) ?>"><?= $this->icon('phone') ?> <?= e($managerPhone) ?></a>
+                <?php endif ?>
+            </div>
+        <?php endif ?>
+    <?php endif ?>
+</div>
