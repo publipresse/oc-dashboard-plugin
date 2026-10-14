@@ -4,32 +4,45 @@
         <p class="pp-dash-error"><?= e($error) ?></p>
     <?php elseif (!$managerName && !count($domains)): ?>
         <div class="pp-dash-placeholder">
-            <span class="pp-dash-badge pp-dash-badge--site"><?= $this->badgeIcon('ph ph-globe-hemisphere-west') ?></span>
+            <span class="pp-dash-badge pp-dash-tone--site"><?= $this->badgeIcon('ph ph-globe-hemisphere-west') ?></span>
             <p class="pp-dash-empty">Aucune information renseignée. Configurez le module pour les ajouter.</p>
         </div>
     <?php else: ?>
         <div class="pp-dash-header">
-            <span class="pp-dash-badge pp-dash-badge--site"><?= $this->badgeIcon('ph ph-globe-hemisphere-west') ?></span>
+            <span class="pp-dash-badge pp-dash-tone--site"><?= $this->badgeIcon('ph ph-globe-hemisphere-west') ?></span>
             <div class="pp-dash-text">
                 <span class="pp-dash-eyebrow"><?= e($this->widgetTitle()) ?></span>
                 <p class="pp-dash-headline"><?= e($managerName ?: 'Non renseigné') ?></p>
-                <?php if ($managerCompany): ?>
-                    <ul class="pp-dash-detail-lines">
-                        <li><?= $this->icon('building') ?> <?= e($managerCompany) ?></li>
+                <?php if ($registrar): ?>
+                    <ul class="pp-dash-meta">
+                        <li><?= $this->icon('shield') ?> Registrar : <?= e($registrar) ?></li>
                     </ul>
                 <?php endif ?>
             </div>
         </div>
 
         <?php if (count($domains)): ?>
-            <div class="pp-dash-body">
-                <p class="pp-dash-section-title">Domaines achetés</p>
-                <ul class="pp-dash-domains">
-                    <?php foreach ($domains as $domain): ?>
-                        <li><?= e($domain) ?></li>
-                    <?php endforeach ?>
-                </ul>
-            </div>
+            <ul class="pp-dash-facts">
+                <li class="pp-dash-fact">
+                    <span class="pp-dash-fact__icon pp-dash-tone--site"><i class="ph ph-globe"></i></span>
+                    <div class="pp-dash-fact__text">
+                        <span class="pp-dash-fact__label">
+                            Domaines achetés <span class="pp-dash-count"><?= count($domains) ?></span>
+                        </span>
+                        <ul class="pp-dash-domains pp-dash-tone--site">
+                            <?php foreach ($domains as $domain): ?>
+                                <li>
+                                    <?php if ($domain['url']): ?>
+                                        <a href="<?= e($domain['url']) ?>" target="_blank" rel="noopener noreferrer"><?= e($domain['label']) ?></a>
+                                    <?php else: ?>
+                                        <span><?= e($domain['label']) ?></span>
+                                    <?php endif ?>
+                                </li>
+                            <?php endforeach ?>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
         <?php endif ?>
 
         <?php if ($managerPhone || $managerEmail): ?>
@@ -38,7 +51,7 @@
                     <a href="mailto:<?= e($managerEmail) ?>"><?= $this->icon('email') ?> <?= e($managerEmail) ?></a>
                 <?php endif ?>
                 <?php if ($managerPhone): ?>
-                    <a href="tel:<?= e(preg_replace('/[^0-9+]/', '', $managerPhone)) ?>"><?= $this->icon('phone') ?> <?= e($managerPhone) ?></a>
+                    <a href="<?= e($this->phoneHref($managerPhone)) ?>"><?= $this->icon('phone') ?> <?= e($managerPhone) ?></a>
                 <?php endif ?>
             </div>
         <?php endif ?>

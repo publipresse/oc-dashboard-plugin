@@ -1,2 +1,4 @@
 1.0.1:
     - "Version initiale des modules de tableau de bord."
+1.0.2:
+    - "Refonte des blocs Statut, Domaines et Interlocuteur ; le support technique et le Drive rejoignent le bloc Interlocuteur."

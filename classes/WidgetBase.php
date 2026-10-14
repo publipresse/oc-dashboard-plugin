@@ -188,9 +188,10 @@ abstract class WidgetBase extends ReportWidgetBase
         $icons = [
             'email' => '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 6 8 7 8-7"/>',
             'phone' => '<path d="M6 3h3l1.5 4.5L8.5 9a10 10 0 0 0 6.5 6.5l1.5-2L21 15v3a2 2 0 0 1-2 2C11.5 20 4 12.5 4 5a2 2 0 0 1 2-2Z"/>',
-            'calendar' => '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/>',
             'building' => '<path d="M5 21V5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v16"/><path d="M14 9h4a1 1 0 0 1 1 1v11"/>'
                 . '<path d="M9 8h.01M9 12h.01M9 16h.01"/><path d="M3 21h18"/>',
+            'external' => '<path d="M7 17 17 7"/><path d="M8 7h9v9"/>',
+            'shield' => '<path d="M12 3 5 6v5c0 4.5 3 8.3 7 10 4-1.7 7-5.5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/>',
         ];
 
         $body = $icons[$name] ?? $icons['email'];
@@ -198,6 +199,28 @@ abstract class WidgetBase extends ReportWidgetBase
         return '<svg class="pp-dash-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
             . 'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
             . $body . '</svg>';
+    }
+
+    /**
+     * formatPhone spaces out a French 10-digit number by pairs ("0381679080" becomes
+     * "03 81 67 90 80") so every number on the dashboard reads the same way, and leaves any
+     * other format (international, extensions...) as entered.
+     */
+    protected function formatPhone(?string $phone): string
+    {
+        $phone = trim((string) $phone);
+        $digits = preg_replace('/\D/', '', $phone);
+
+        if (strlen($digits) === 10 && str_starts_with($digits, '0') && !str_contains($phone, '+')) {
+            return implode(' ', str_split($digits, 2));
+        }
+
+        return $phone;
+    }
+
+    protected function phoneHref(string $phone): string
+    {
+        return 'tel:' . preg_replace('/[^0-9+]/', '', $phone);
     }
 
     /**
@@ -232,21 +255,23 @@ abstract class WidgetBase extends ReportWidgetBase
     }
 
     /**
-     * scoreBar renders a compact horizontal progress bar for a 0-100 score.
+     * scoreRing renders a 0-100 score as a circular gauge sized like a fact icon tile. The arc
+     * uses pathLength="100" so its dash length is the score itself, and the stylesheet sweeps it
+     * in from zero when the widget loads.
      */
-    protected function scoreBar(?float $score): string
+    protected function scoreRing(float $score): string
     {
-        if ($score === null) {
-            return '';
-        }
-
         $score = max(0, min(100, $score));
         ['color' => $color] = $this->scoreLevel($score);
+        $text = $this->scoreText($score);
 
-        return '<div class="pp-dash-bar">'
-            . '<div class="pp-dash-bar__track">'
-            . '<div class="pp-dash-bar__value" style="width:' . $score . '%;background:' . e($color) . '"></div>'
-            . '</div>'
-            . '</div>';
+        return '<span class="pp-dash-ring" style="--pp-dash-ring-color:' . e($color) . '" role="img" '
+            . 'aria-label="Score ' . e($text) . ' sur 100">'
+            . '<svg viewBox="0 0 44 44" aria-hidden="true">'
+            . '<circle class="pp-dash-ring__track" cx="22" cy="22" r="19" pathLength="100"/>'
+            . '<circle class="pp-dash-ring__value" cx="22" cy="22" r="19" pathLength="100" stroke-dasharray="' . $score . ' 100"/>'
+            . '</svg>'
+            . '<span class="pp-dash-ring__label" aria-hidden="true">' . e($text) . '</span>'
+            . '</span>';
     }
 }

@@ -2,23 +2,59 @@
 <div class="pp-dash">
     <?php if (isset($error)): ?>
         <p class="pp-dash-error"><?= e($error) ?></p>
-    <?php elseif (!$managerName && !$managerPhone && !$managerEmail): ?>
+    <?php elseif (!$managerName && !$supportEmail && !$supportPhone && !$driveUrl): ?>
         <div class="pp-dash-placeholder">
-            <span class="pp-dash-badge pp-dash-badge--contact"><?= $this->badgeIcon('ph ph-user') ?></span>
+            <span class="pp-dash-badge pp-dash-tone--contact"><?= $this->badgeIcon('ph ph-user') ?></span>
             <p class="pp-dash-empty">Choisissez votre commercial dans la configuration du module.</p>
         </div>
     <?php else: ?>
         <div class="pp-dash-header">
             <?php if ($managerPhoto): ?>
-                <span class="pp-dash-badge pp-dash-badge--photo"><img src="<?= e($managerPhoto) ?>" alt="<?= e($managerName) ?>"></span>
+                <span class="pp-dash-avatar"><img src="<?= e($managerPhoto) ?>" alt="<?= e($managerName) ?>"></span>
             <?php else: ?>
-                <span class="pp-dash-badge pp-dash-badge--contact"><?= $this->badgeIcon('ph ph-user') ?></span>
+                <span class="pp-dash-badge pp-dash-tone--contact"><?= $this->badgeIcon('ph ph-user') ?></span>
             <?php endif ?>
             <div class="pp-dash-text">
                 <span class="pp-dash-eyebrow"><?= e($this->widgetTitle()) ?></span>
-                <p class="pp-dash-headline"><?= e($managerName) ?></p>
+                <p class="pp-dash-headline"><?= e($managerName ?: 'Publipresse') ?></p>
+                <?php if ($managerName): ?>
+                    <ul class="pp-dash-meta">
+                        <li><?= $this->icon('building') ?> Publipresse</li>
+                    </ul>
+                <?php endif ?>
             </div>
         </div>
+
+        <?php if ($supportEmail || $supportPhone || $driveUrl): ?>
+            <ul class="pp-dash-facts">
+                <?php if ($supportEmail || $supportPhone): ?>
+                    <li class="pp-dash-fact">
+                        <span class="pp-dash-fact__icon pp-dash-tone--support"><i class="ph ph-headset"></i></span>
+                        <div class="pp-dash-fact__text">
+                            <span class="pp-dash-fact__label">Support technique</span>
+                            <?php if ($supportEmail): ?>
+                                <a class="pp-dash-fact__value" href="mailto:<?= e($supportEmail) ?>"><?= e($supportEmail) ?></a>
+                            <?php endif ?>
+                            <?php if ($supportPhone): ?>
+                                <a class="<?= $supportEmail ? 'pp-dash-fact__meta' : 'pp-dash-fact__value' ?>" href="<?= e($this->phoneHref($supportPhone)) ?>"><?= e($supportPhone) ?></a>
+                            <?php endif ?>
+                        </div>
+                    </li>
+                <?php endif ?>
+                <?php if ($driveUrl): ?>
+                    <li class="pp-dash-fact">
+                        <span class="pp-dash-fact__icon pp-dash-tone--drive"><i class="ph ph-images"></i></span>
+                        <div class="pp-dash-fact__text">
+                            <span class="pp-dash-fact__label">Drive photos</span>
+                            <a class="pp-dash-fact__value pp-dash-fact__value--link" href="<?= e($driveUrl) ?>" target="_blank" rel="noopener noreferrer">
+                                Accéder à mon Drive <?= $this->icon('external') ?>
+                            </a>
+                            <span class="pp-dash-fact__meta">Vos photos et documents partagés</span>
+                        </div>
+                    </li>
+                <?php endif ?>
+            </ul>
+        <?php endif ?>
 
         <?php if ($managerPhone || $managerEmail): ?>
             <div class="pp-dash-footer">
@@ -26,7 +62,7 @@
                     <a href="mailto:<?= e($managerEmail) ?>"><?= $this->icon('email') ?> <?= e($managerEmail) ?></a>
                 <?php endif ?>
                 <?php if ($managerPhone): ?>
-                    <a href="tel:<?= e(preg_replace('/[^0-9+]/', '', $managerPhone)) ?>"><?= $this->icon('phone') ?> <?= e($managerPhone) ?></a>
+                    <a href="<?= e($this->phoneHref($managerPhone)) ?>"><?= $this->icon('phone') ?> <?= e($managerPhone) ?></a>
                 <?php endif ?>
             </div>
         <?php endif ?>

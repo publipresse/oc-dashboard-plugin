@@ -4,12 +4,12 @@
         <p class="pp-dash-error"><?= e($error) ?></p>
     <?php elseif (!$iframe): ?>
         <div class="pp-dash-placeholder">
-            <span class="pp-dash-badge pp-dash-badge--iframe"><?= $this->badgeIcon('ph ph-browser') ?></span>
+            <span class="pp-dash-badge pp-dash-tone--iframe"><?= $this->badgeIcon('ph ph-browser') ?></span>
             <p class="pp-dash-empty">Aucun code iframe valide renseigné. Collez le code d'intégration (balise &lt;iframe&gt;) dans la configuration du module.</p>
         </div>
     <?php else: ?>
         <div class="pp-dash-header">
-            <span class="pp-dash-badge pp-dash-badge--iframe"><?= $this->badgeIcon('ph ph-browser') ?></span>
+            <span class="pp-dash-badge pp-dash-tone--iframe"><?= $this->badgeIcon('ph ph-browser') ?></span>
             <div class="pp-dash-text">
                 <span class="pp-dash-eyebrow"><?= e($this->widgetTitle()) ?></span>
                 <p class="pp-dash-headline"><?= e($host ?: 'Page externe') ?></p>

@@ -9,7 +9,6 @@ use Publipresse\Dashboard\ReportWidgets\Breves;
 use Publipresse\Dashboard\ReportWidgets\Iframe;
 use Publipresse\Dashboard\ReportWidgets\LaunchDate;
 use Publipresse\Dashboard\ReportWidgets\SiteInfo;
-use Publipresse\Dashboard\ReportWidgets\SupportContact;
 
 class Plugin extends PluginBase
 {
@@ -27,12 +26,7 @@ class Plugin extends PluginBase
     {
         return [
             AccountManager::class => [
-                'label' => 'Contact commercial',
-                'context' => 'dashboard',
-                'group' => 'Publipresse',
-            ],
-            SupportContact::class => [
-                'label' => 'Support technique',
+                'label' => 'Interlocuteur, support & Drive',
                 'context' => 'dashboard',
                 'group' => 'Publipresse',
             ],

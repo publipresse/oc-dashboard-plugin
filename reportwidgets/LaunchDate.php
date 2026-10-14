@@ -4,14 +4,16 @@ namespace Publipresse\Dashboard\ReportWidgets;
 
 use Backend;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Cms\Models\MaintenanceSetting;
 use Publipresse\Dashboard\Classes\WidgetBase;
 use Throwable;
+use Url;
 
 /**
- * Displays the website's go live date, entered once when configuring the widget, along with
- * the current maintenance status, a link to the maintenance mode settings page, and the SE
- * Ranking audit score captured for the site.
+ * Displays the website's live status along with the go live date, entered once when
+ * configuring the widget, a link to the maintenance mode settings page, and the SE Ranking
+ * audit score captured for the site.
  */
 class LaunchDate extends WidgetBase
 {
@@ -46,7 +48,6 @@ class LaunchDate extends WidgetBase
 
     protected function prepareVars(): void
     {
-        $this->vars['launchDate'] = $this->formatDate($this->property('launchDate'));
         // The CMS's own maintenance mode (toggled from the settings page we link to below) is
         // driven by MaintenanceSetting, not by Laravel's artisan up/down file lock. We read the
         // raw setting rather than MaintenanceSetting::isEnabled(), which always reports "false"
@@ -55,16 +56,24 @@ class LaunchDate extends WidgetBase
         $this->vars['isDown'] = (bool) MaintenanceSetting::get('is_enabled', false);
         $this->vars['maintenanceSettingsUrl'] = Backend::url('system/settings/update/october/cms/maintenance_settings');
 
+        $siteUrl = Url::to('/');
+        $this->vars['siteUrl'] = $siteUrl;
+        $this->vars['siteHost'] = parse_url($siteUrl, PHP_URL_HOST) ?: $siteUrl;
+
+        $launchDate = $this->parseDate($this->property('launchDate'));
+        $this->vars['launchDate'] = $launchDate ? $this->longDate($launchDate) : null;
+        $this->vars['isLaunched'] = !$launchDate || !$launchDate->isFuture();
+        $this->vars['launchAge'] = $launchDate ? $this->relativeAge($launchDate) : null;
+
         $score = is_numeric($this->property('score')) ? (float) $this->property('score') : null;
         $this->vars['score'] = $score;
-        $this->vars['scoreHeadline'] = $score !== null
-            ? $this->scoreText($score) . ' - ' . $this->scoreLevel($score)['label']
-            : null;
-        $this->vars['bar'] = $this->scoreBar($score);
+        $this->vars['scoreText'] = $score !== null ? $this->scoreText($score) : null;
+        $this->vars['scoreLabel'] = $score !== null ? $this->scoreLevel($score)['label'] : null;
+        $this->vars['ring'] = $score !== null ? $this->scoreRing($score) : '';
         $this->vars['reportUrl'] = $this->safeUrl($this->property('reportUrl'));
     }
 
-    protected function formatDate($date): ?string
+    protected function parseDate($date): ?Carbon
     {
         $date = trim((string) $date);
         if ($date === '') {
@@ -75,7 +84,7 @@ class LaunchDate extends WidgetBase
         // latter can come from a date value entered/pasted in that shape.
         foreach (['d/m/Y', 'Y-m-d'] as $format) {
             try {
-                return Carbon::createFromFormat($format, $date)->format('d/m/Y');
+                return Carbon::createFromFormat('!' . $format, $date);
             }
             catch (Throwable $ex) {
                 continue;
@@ -83,5 +92,40 @@ class LaunchDate extends WidgetBase
         }
 
         return null;
+    }
+
+    /**
+     * longDate spells the date out in French ("1er février 2026"), using the ordinal
+     * abbreviation French typography expects for the first day of the month.
+     */
+    protected function longDate(Carbon $date): string
+    {
+        $date = $date->copy()->locale('fr');
+
+        return ($date->day === 1 ? '1er' : $date->day) . ' ' . $date->translatedFormat('F Y');
+    }
+
+    /**
+     * relativeAge describes how long ago the site went live ("Il y a 7 mois", "Il y a 1 an et
+     * 2 mois") or how soon it will ("Dans 5 jours"), rounded to the unit that matters at that
+     * scale rather than Carbon's default "7 mois et 3 semaines".
+     */
+    protected function relativeAge(Carbon $date): string
+    {
+        $today = Carbon::today();
+        if ($date->isSameDay($today)) {
+            return 'Aujourd\'hui';
+        }
+
+        $isOverAYear = $date->diffInMonths($today, true) >= 12;
+
+        $age = $date->copy()->locale('fr')->diffForHumans($today, [
+            'syntax' => CarbonInterface::DIFF_RELATIVE_TO_NOW,
+            'parts' => $isOverAYear ? 2 : 1,
+            'join' => true,
+            'skip' => $isOverAYear ? ['week', 'day'] : [],
+        ]);
+
+        return mb_strtoupper(mb_substr($age, 0, 1)) . mb_substr($age, 1);
     }
 }

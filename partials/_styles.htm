@@ -25,6 +25,9 @@
 }
 
 .pp-dash {
+    /* Lets the fact grid switch to two columns from the widget's own width rather than the
+       viewport's, since the same widget can be dropped in a narrow or a wide dashboard slot. */
+    container: pp-dash / inline-size;
     font-size: 14px;
     line-height: 1.5;
     color: var(--bs-body-color);
@@ -38,19 +41,23 @@
 .pp-dash a:hover { text-decoration: underline; }
 .pp-dash-error { color: #e05353; margin: 0; }
 .pp-dash-empty { opacity: .65; font-style: italic; margin: 0; }
-.pp-dash-section-title {
-    margin: 1rem 0 .4rem;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    opacity: .6;
-}
 
 .pp-dash-icon { width: 100%; height: 100%; }
 
+/* Accent palette: each tone feeds the solid header badges, the tinted fact tiles and the pulse dot */
+.pp-dash-tone--online { --pp-dash-accent-rgb: 39, 174, 96; }
+.pp-dash-tone--maintenance { --pp-dash-accent-rgb: 230, 126, 34; }
+.pp-dash-tone--launch { --pp-dash-accent-rgb: 20, 184, 166; }
+.pp-dash-tone--site { --pp-dash-accent-rgb: 14, 165, 233; }
+.pp-dash-tone--contact { --pp-dash-accent-rgb: 99, 102, 241; }
+.pp-dash-tone--support { --pp-dash-accent-rgb: 16, 185, 129; }
+.pp-dash-tone--drive { --pp-dash-accent-rgb: 245, 158, 11; }
+.pp-dash-tone--breves { --pp-dash-accent-rgb: 245, 158, 11; }
+.pp-dash-tone--iframe { --pp-dash-accent-rgb: 139, 92, 246; }
+
 /* Card layout: icon + headline in the header, free content in the body, a bleeding footer bar for links/actions */
 .pp-dash-header { display: flex; align-items: flex-start; gap: .85rem; }
+.pp-dash-header:has(.pp-dash-avatar) { align-items: center; }
 .pp-dash-text { min-width: 0; }
 .pp-dash-eyebrow {
     display: block;
@@ -60,9 +67,7 @@
     margin: 0 0 .1rem;
 }
 /* Scoped to .pp-dash-text (rather than .pp-dash-headline alone) so this margin reliably wins
-   over the generic ".pp-dash p" rule regardless of whether the headline is a <p> or, when it
-   doubles as a mailto/tel link (e.g. Support technique), an <a> — which .pp-dash p never
-   matches, so relying on it left the <a> variant with no bottom margin at all. */
+   over the generic ".pp-dash p" rule. */
 .pp-dash-text .pp-dash-headline {
     display: block;
     font-size: 24px;
@@ -72,19 +77,30 @@
     line-height: 1.25;
     overflow-wrap: anywhere;
 }
-/* A headline can double as a mailto/tel link (e.g. Support technique); keep it looking like
-   plain text rather than a blue link, with an underline only on hover as the clickable cue. */
-a.pp-dash-headline {
-    color: var(--bs-body-color);
-    text-decoration: none;
+
+/* Secondary line under the headline (company, site address...), sized so every header in a
+   row ends at the same height and their fact grids line up. */
+.pp-dash-meta {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .15rem 1rem;
+    font-size: 13px;
+    color: var(--bs-secondary-color);
 }
-a.pp-dash-headline:hover { text-decoration: underline; }
+.pp-dash-meta li { display: inline-flex; align-items: center; gap: .35rem; min-width: 0; }
+.pp-dash-meta .pp-dash-icon { flex: 0 0 auto; width: 14px; height: 14px; }
+.pp-dash .pp-dash-meta a { display: inline-flex; align-items: center; gap: .3rem; color: inherit; }
+.pp-dash .pp-dash-meta a:hover { color: var(--bs-body-color); }
 
 .pp-dash-body { flex: 1 1 auto; min-height: 0; margin-top: .9rem; overflow: auto; }
 
-/* Guarantees breathing room above the footer bar, whether it follows the header directly or the body */
+/* Guarantees breathing room above the footer bar, whatever block it follows */
 .pp-dash-header:has(+ .pp-dash-footer),
-.pp-dash-body:has(+ .pp-dash-footer) {
+.pp-dash-body:has(+ .pp-dash-footer),
+.pp-dash-facts:has(+ .pp-dash-footer) {
     margin-bottom: 1.1rem;
 }
 
@@ -116,22 +132,47 @@ a.pp-dash-headline:hover { text-decoration: underline; }
     background: rgb(var(--pp-dash-accent-rgb, 99, 102, 241));
     color: #fff;
 }
-.pp-dash-badge img { width: 100%; height: 100%; object-fit: cover; }
 .pp-dash-badge i { font-size: 28px; line-height: 1; color: inherit; }
-.pp-dash-badge .pp-dash-icon { width: 22px; height: 22px; }
-/* Account manager's photo, 1.5x the standard 36px badge for a real portrait rather than an
-   icon-sized thumbnail. */
-.pp-dash-badge--photo { width: 54px; height: 54px; border-radius: 9px; }
-.pp-dash-header:has(.pp-dash-badge--photo) { align-items: center; }
-.pp-dash-badge--contact { --pp-dash-accent-rgb: 99, 102, 241; }
-.pp-dash-badge--support { --pp-dash-accent-rgb: 16, 185, 129; }
-.pp-dash-badge--site { --pp-dash-accent-rgb: 14, 165, 233; }
-.pp-dash-badge--breves { --pp-dash-accent-rgb: 245, 158, 11; }
-.pp-dash-badge--iframe { --pp-dash-accent-rgb: 139, 92, 246; }
-.pp-dash-badge--report { --pp-dash-accent-rgb: 244, 63, 94; }
-.pp-dash-badge--launch { --pp-dash-accent-rgb: 20, 184, 166; }
-.pp-dash-badge--online { --pp-dash-accent-rgb: 39, 174, 96; }
-.pp-dash-badge--maintenance { --pp-dash-accent-rgb: 230, 126, 34; }
+
+/* Account manager's portrait, circled by a thin accent ring set off from the photo by a gap
+   in the card's own background color, so it reads well on both light and dark themes. */
+.pp-dash-avatar {
+    --pp-dash-accent-rgb: 99, 102, 241;
+    flex: 0 0 auto;
+    width: 56px;
+    height: 56px;
+    margin: 4px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--bs-secondary-bg);
+    box-shadow: 0 0 0 3px var(--oc-toolbar-bg, var(--bs-body-bg)), 0 0 0 4px rgba(var(--pp-dash-accent-rgb), .55);
+}
+.pp-dash-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* Live status dot next to the headline, with a soft ripple for the "live" feel */
+.pp-dash-pulse {
+    position: relative;
+    top: -.12em;
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    margin-left: .45rem;
+    border-radius: 50%;
+    background: rgb(var(--pp-dash-accent-rgb));
+    vertical-align: middle;
+}
+.pp-dash-pulse::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: inherit;
+    animation: pp-dash-pulse 2.4s cubic-bezier(0, 0, .2, 1) infinite;
+}
+@keyframes pp-dash-pulse {
+    0% { transform: scale(1); opacity: .6; }
+    75%, 100% { transform: scale(3.2); opacity: 0; }
+}
 
 .pp-dash-placeholder {
     display: flex;
@@ -143,31 +184,125 @@ a.pp-dash-headline:hover { text-decoration: underline; }
     margin: auto 0;
 }
 
-.pp-dash-contact__list { list-style: none; margin: 0; padding: 0; }
-.pp-dash-contact__list li { margin-bottom: .15rem; }
-
-.pp-dash-subtext { font-size: 12px; opacity: .65; margin: 0 0 .35rem; }
-
-.pp-dash-detail-lines { list-style: none; margin: 0; padding: 0; }
-.pp-dash-detail-lines li { display: flex; align-items: center; gap: .4rem; margin-bottom: .2rem; }
-.pp-dash-detail-lines .pp-dash-icon { flex: 0 0 auto; width: 14px; height: 14px; opacity: .6; }
-/* A detail line can double as a mailto/tel link; keep the same look as plain text and only
-   underline on hover as the clickable cue, so it doesn't compete with the footer link color. */
-.pp-dash-detail-lines li a {
+/* Key facts under the header: a tinted icon tile (or score ring) followed by label, value and
+   an optional detail line. One column in narrow slots, two side by side once there is room. */
+.pp-dash-facts {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 1rem 0 0;
+    border-top: 1px solid var(--bs-border-color);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 1rem 1.5rem;
+}
+@container pp-dash (min-width: 520px) {
+    .pp-dash-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pp-dash-fact:only-child { grid-column: 1 / -1; }
+}
+.pp-dash-fact { display: flex; align-items: flex-start; gap: .85rem; min-width: 0; }
+.pp-dash-fact__icon {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
-    gap: .4rem;
-    color: inherit;
+    justify-content: center;
+    background: rgba(var(--pp-dash-accent-rgb), .14);
+    color: rgb(var(--pp-dash-accent-rgb));
+}
+.pp-dash-fact__icon i { font-size: 22px; line-height: 1; }
+.pp-dash-fact__text { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
+.pp-dash-fact__label { font-size: 13px; line-height: 1.4; color: var(--bs-secondary-color); }
+.pp-dash-fact__value {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--bs-body-color);
+    overflow-wrap: anywhere;
+}
+.pp-dash-fact__meta { font-size: 13px; line-height: 1.45; color: var(--bs-secondary-color); overflow-wrap: anywhere; }
+/* Fact values can double as mailto/tel links; keep them looking like plain text with an
+   underline on hover, and reserve the link color for real calls to action. */
+.pp-dash a.pp-dash-fact__value { color: var(--bs-body-color); }
+.pp-dash a.pp-dash-fact__meta { color: var(--bs-secondary-color); }
+.pp-dash a.pp-dash-fact__value--link {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    color: var(--bs-link-color, var(--bs-primary, #2196f3));
+}
+.pp-dash-fact__value .pp-dash-icon { flex: 0 0 auto; width: 15px; height: 15px; }
+
+.pp-dash-count {
+    display: inline-block;
+    min-width: 1.6em;
+    margin-left: .25rem;
+    padding: 0 .4em;
+    border-radius: 999px;
+    background: var(--bs-secondary-bg);
+    color: var(--bs-body-color);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.6;
+    text-align: center;
+}
+
+/* Score gauge: pathLength="100" makes the arc's dash length the score itself */
+.pp-dash-ring { position: relative; flex: 0 0 auto; width: 40px; height: 40px; }
+.pp-dash-ring svg { display: block; width: 100%; height: 100%; transform: rotate(-90deg); }
+.pp-dash-ring circle { fill: none; stroke-width: 4; }
+.pp-dash-ring__track { stroke: var(--bs-secondary-bg); }
+.pp-dash-ring__value {
+    stroke: var(--pp-dash-ring-color);
+    stroke-linecap: round;
+    animation: pp-dash-ring 1.2s cubic-bezier(.3, .7, .4, 1) both;
+}
+@keyframes pp-dash-ring {
+    from { stroke-dasharray: 0 100; }
+}
+.pp-dash-ring__label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--bs-body-color);
+}
+
+.pp-dash-domains { list-style: none; margin: .4rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .35rem; }
+.pp-dash .pp-dash-domains a,
+.pp-dash-domains span {
+    display: inline-block;
+    padding: .15rem .6rem;
+    border-radius: 999px;
+    background: var(--bs-secondary-bg);
+    color: var(--bs-body-color);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.6;
+    transition: background-color .15s ease, color .15s ease;
+}
+.pp-dash .pp-dash-domains a:hover {
+    background: rgba(var(--pp-dash-accent-rgb), .16);
+    color: rgb(var(--pp-dash-accent-rgb));
     text-decoration: none;
 }
-.pp-dash-detail-lines li a:hover { text-decoration: underline; }
+
+@media (prefers-reduced-motion: reduce) {
+    .pp-dash-pulse::after,
+    .pp-dash-ring__value { animation: none; }
+}
 
 .pp-dash-feed { list-style: none; margin: 0; padding: 0; }
 .pp-dash-feed li { padding: .5rem 0; border-bottom: 1px solid var(--bs-border-color); }
 .pp-dash-feed li:first-child { padding-top: 0; }
 .pp-dash-feed li:last-child { border-bottom: 0; }
 .pp-dash-feed__title { font-weight: 600; }
-.pp-dash-feed__date { opacity: .6; font-size: 12px; }
 .pp-dash-feed__desc { margin: .2rem 0 0; opacity: .85; }
 .pp-dash-feed__head { display: flex; align-items: center; justify-content: space-between; gap: .6rem; }
 .pp-dash-feed__tag {
@@ -182,44 +317,6 @@ a.pp-dash-headline:hover { text-decoration: underline; }
     letter-spacing: .02em;
     opacity: .8;
 }
-
-.pp-dash-info { list-style: none; margin: 0; padding: 0; }
-.pp-dash-info > li {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 1rem;
-    padding: .5rem 0;
-    border-bottom: 1px solid var(--bs-border-color);
-}
-.pp-dash-info > li:first-child { padding-top: 0; }
-.pp-dash-info > li:last-child { border-bottom: 0; }
-.pp-dash-info__label { opacity: .65; }
-.pp-dash-info__value { text-align: right; font-weight: 600; }
-.pp-dash-domains { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
-.pp-dash-domains li {
-    padding: .3rem .6rem;
-    border-radius: 999px;
-    background: var(--bs-secondary-bg);
-    font-weight: 500;
-    font-size: 12px;
-}
-.pp-dash-domains__meta { opacity: .6; font-size: 12px; }
-
-.pp-dash-bar__track {
-    width: 100%;
-    height: 8px;
-    border-radius: 999px;
-    background: var(--bs-secondary-bg);
-    overflow: hidden;
-}
-.pp-dash-bar__value {
-    height: 100%;
-    border-radius: 999px;
-    transition: width .3s ease;
-}
-/* Breathing room when a line of text (e.g. the go-live date) follows the bar directly. */
-.pp-dash-bar + .pp-dash-subtext { margin-top: .5rem; }
 
 .pp-dash-iframe { width: 100%; height: 100%; min-height: 120px; border: 0; display: block; border-radius: 6px; }
 </style>
