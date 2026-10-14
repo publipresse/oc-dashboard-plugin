@@ -20,7 +20,6 @@ class AccountManager extends WidgetBase
                 'title' => 'Commercial',
                 'description' => 'Choisissez votre interlocuteur dans l\'annuaire Publipresse',
                 'type' => 'dropdown',
-                'default' => '',
                 'options' => SalesManagerRepository::options(),
             ],
             'supportEmail' => [
@@ -34,10 +33,9 @@ class AccountManager extends WidgetBase
                 'default' => '03 81 67 90 80',
             ],
             'driveUrl' => [
-                'title' => 'Lien Google Drive',
-                'description' => 'Lien vers le drive photos du client (http/https)',
+                'title' => 'Lien Google Drive (optionnel)',
+                'description' => 'Lien vers le drive photos du client (http/https). Laissez vide pour masquer le Drive photos',
                 'type' => 'string',
-                'default' => '',
             ],
         ];
     }

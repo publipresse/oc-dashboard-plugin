@@ -8,6 +8,11 @@ use Media\Classes\MediaLibrary;
 
 /**
  * Base class shared by all Publipresse dashboard report widgets.
+ *
+ * Optional properties must not declare 'default' => ''. The inspector drops any value equal
+ * to its default before the dashboard merges the result back into the saved configuration,
+ * so a field emptied by the user would silently keep its previous value. Remove this
+ * workaround once October deletes the dropped keys (report-widget.js, showInspector).
  */
 abstract class WidgetBase extends ReportWidgetBase
 {

@@ -17,30 +17,25 @@ class SiteInfo extends WidgetBase
             'managerName' => [
                 'title' => 'Gestionnaire du domaine',
                 'type' => 'string',
-                'default' => '',
             ],
             'registrar' => [
                 'title' => 'Registrar',
                 'description' => 'Bureau d\'enregistrement des domaines (OVHcloud, Gandi, IONOS...)',
                 'type' => 'string',
-                'default' => '',
             ],
             'managerEmail' => [
                 'title' => 'Email du gestionnaire',
                 'type' => 'string',
-                'default' => '',
             ],
             'managerPhone' => [
                 'title' => 'Téléphone du gestionnaire',
                 'type' => 'string',
-                'default' => '',
             ],
             'domains' => [
                 'title' => 'Domaines achetés',
                 'description' => 'Un domaine par ligne',
                 'type' => 'text',
                 'size' => 'medium',
-                'default' => '',
             ],
         ];
     }

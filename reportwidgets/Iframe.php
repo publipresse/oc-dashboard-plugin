@@ -24,13 +24,21 @@ class Iframe extends WidgetBase
 
     public function defineProperties()
     {
-        return $this->titleProperty('Statistiques') + $this->iconProperty('ph ph-browser') + [
+        $eyebrow = $this->titleProperty('Statistiques');
+        $eyebrow['title']['title'] = 'Surtitre';
+        $eyebrow['title']['validationMessage'] = 'Le surtitre est obligatoire';
+
+        return $eyebrow + $this->iconProperty('ph ph-browser') + [
+            'headline' => [
+                'title' => 'Titre',
+                'description' => 'Laissez vide pour afficher le nom de domaine de la page intégrée',
+                'type' => 'string',
+            ],
             'iframeCode' => [
                 'title' => 'Code iframe',
                 'description' => 'Collez ici le code d\'intégration complet fourni par le prestataire (la balise <iframe>...</iframe>)',
                 'type' => 'text',
                 'size' => 'large',
-                'default' => '',
             ],
             'height' => [
                 'title' => 'Hauteur du bloc (px)',
@@ -47,7 +55,9 @@ class Iframe extends WidgetBase
         $iframe = $this->extractIframe((string) $this->property('iframeCode'));
 
         $this->vars['iframe'] = $iframe;
-        $this->vars['host'] = $iframe ? parse_url($iframe['src'], PHP_URL_HOST) : null;
+        $this->vars['headline'] = trim((string) $this->property('headline'))
+            ?: ($iframe ? parse_url($iframe['src'], PHP_URL_HOST) : null)
+            ?: 'Page externe';
         $this->vars['height'] = max(80, (int) $this->property('height', 700));
     }
 

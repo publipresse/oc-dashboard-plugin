@@ -26,14 +26,12 @@ class LaunchDate extends WidgetBase
                 'title' => 'Date de mise en ligne',
                 'description' => 'Format JJ/MM/AAAA',
                 'type' => 'string',
-                'default' => '',
                 'validationPattern' => '^$|^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/[0-9]{4}$',
                 'validationMessage' => 'Utilisez le format JJ/MM/AAAA',
             ],
             'score' => [
                 'title' => 'Score SE Ranking / 100',
                 'type' => 'string',
-                'default' => '',
                 'validationPattern' => '^$|^(100|[0-9]{1,2})$',
                 'validationMessage' => 'Indiquez un score entre 0 et 100',
             ],
@@ -41,7 +39,6 @@ class LaunchDate extends WidgetBase
                 'title' => 'Lien vers le rapport SE Ranking',
                 'description' => 'URL du rapport SE Ranking partagé (http/https)',
                 'type' => 'string',
-                'default' => '',
             ],
         ];
     }
