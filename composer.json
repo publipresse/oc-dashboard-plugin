@@ -1,0 +1,11 @@
+{
+    "name": "publipresse/dashboard-plugin",
+    "type": "october-plugin",
+    "description": "Publipresse dashboard widgets for October CMS.",
+    "keywords": ["october", "cms", "plugin", "dashboard", "widgets"],
+    "license": "MIT",
+    "require": {
+        "composer/installers": "~1.0",
+        "october/rain": "^4.4"
+    }
+}
